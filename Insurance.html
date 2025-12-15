@@ -1,22 +1,150 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
-        <title>TDP Cadre Insurance</title>
-        <link rel="SHORTCUT ICON" type="image/x-icon" href="https://www.mypartydashboard.com/images/icons/homePage/TDP.gif">
-</head>       
-<style>
-    .box {
-        width: 38%;
-        height: 47px;
-        background-color: rgb(68, 68, 68);
-        position: absolute;
-        }
-
-</style>
 <body>
-    <div class="box">
 
-    </div>
-        <iframe style="width:100%;height:100vh" src="https://online.anyflip.com/tffke/iwil/index.html"  seamless="seamless" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" ></iframe>
+<h2 id="pageTitle">Login</h2>
+
+<!-- LOGIN SECTION -->
+<div id="loginDiv">
+  <form onsubmit="return loginUser()">
+    Username:
+    <input type="text" id="username" required><br><br>
+
+    Password:
+    <input type="password" id="password" required><br><br>
+
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<!-- FORM SECTION -->
+<div id="formDiv" style="display:none">
+  <h3>Complaint Form</h3>
+
+  <form id="dataForm">
+    Date:
+    <input type="date" name="date" required><br><br>
+
+    Applicant Name:
+    <input type="text" name="applicantName" required><br><br>
+
+    AC Name:
+    <select name="acName" required>
+      <option value="">Select</option>
+      <option>Srikakulam</option>
+      <option>Vizianagaram</option>
+    </select><br><br>
+
+    Village:
+    <input type="text" name="village"><br><br>
+
+    Mandal:
+    <input type="text" name="mandal"><br><br>
+
+    Aadhar Number:
+    <input type="number" name="aadhar" minlength="12" required><br><br>
+
+    Phone Number:
+    <input type="number" name="phone" minlength="10" required><br><br>
+
+    MID:
+    <input type="text" name="mid" required><br><br>
+
+    Complaint Department:
+    <select name="department" required>
+      <option value="">Select</option>
+      <option>Revenue</option>
+      <option>Police</option>
+      <option>Electricity</option>
+      <option>Water</option>
+    </select><br><br>
+
+    <button type="submit">Submit</button>
+    <button type="button" onclick="logout()">Logout</button>
+  </form>
+</div>
+
+<script>
+/* ===== CONFIG ===== */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw5x-Db5LRNEdQ5GpCGYKxNw3U32w79wp6GDGeysMlOGbumYFro3IqaHkmfx9aKDm6c/exec";
+
+/* ===== USERS ===== */
+const users = {
+  "User1": "Agent1",
+  "User2": "Agent2",
+  "User3": "Agent3",
+  "User4": "Agent4",
+  "User5": "Agent5"
+};
+
+/* ===== LOGIN LOGIC ===== */
+function loginUser() {
+  var u = document.getElementById("username").value;
+  var p = document.getElementById("password").value;
+
+  if (users[u] && users[u] === p) {
+    localStorage.setItem("loggedUser", u);
+    showForm();
+  } else {
+    alert("Invalid username or password");
+  }
+  return false;
+}
+
+/* ===== LOGOUT ===== */
+function logout() {
+  localStorage.removeItem("loggedUser");
+  location.reload();
+}
+
+/* ===== SHOW FORM ===== */
+function showForm() {
+  document.getElementById("loginDiv").style.display = "none";
+  document.getElementById("formDiv").style.display = "block";
+  document.getElementById("pageTitle").innerText = "Complaint Entry";
+}
+
+/* ===== RANDOM ID ===== */
+function randomID() {
+  return "ID-" + Math.floor(Math.random() * 1000000);
+}
+
+/* ===== AUTO LOGIN CHECK ===== */
+var user = localStorage.getItem("loggedUser");
+if (user) showForm();
+
+/* ===== FORM SUBMIT ===== */
+document.getElementById("dataForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  var formData = new FormData(this);
+
+  var payload = {
+    id: randomID(),
+    date: formData.get("date"),
+    applicantName: formData.get("applicantName"),
+    acName: formData.get("acName"),
+    village: formData.get("village"),
+    mandal: formData.get("mandal"),
+    aadhar: formData.get("aadhar"),
+    phone: formData.get("phone"),
+    mid: formData.get("mid"),
+    department: formData.get("department"),
+    datetime: new Date().toLocaleString(),
+    user: localStorage.getItem("loggedUser")
+  };
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Data Saved Successfully");
+    document.getElementById("dataForm").reset();
+  });
+});
+</script>
+
 </body>
 </html>
